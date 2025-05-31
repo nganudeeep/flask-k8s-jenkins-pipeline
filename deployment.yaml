@@ -31,3 +31,4 @@ spec:
       port: 5055
       targetPort: 5055
       nodePort: 30036
+ 
