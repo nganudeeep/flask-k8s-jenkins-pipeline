@@ -6,36 +6,30 @@ pipeline {
     }
 
     stages {
-        stage('Use Minikube Docker') {
+        stage('Build & Load Docker Image inside Minikube') {
             steps {
-                // Point Jenkins to Minikube's Docker
-                sh 'eval $(/usr/local/bin/minikube docker-env)'
-            }
-        }
+                sh '''
+                    echo "Setting up Minikube Docker environment..."
+                    eval $(/usr/local/bin/minikube docker-env)
 
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
-            }
-        }
+                    echo "Building Docker image inside Minikube..."
+                    docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
 
-        stage('Load Image into Minikube') {
-            steps {
-                // Optional if image was built inside Minikube
-                sh 'minikube image load $IMAGE_NAME:$IMAGE_TAG'
+                    echo "Docker image built: ${IMAGE_NAME}:${IMAGE_TAG}"
+                '''
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh 'kubectl apply -f deployment.yaml'
+                sh '/usr/local/bin/kubectl apply -f deployment.yaml'
             }
         }
 
         stage('Verify Deployment') {
             steps {
-                sh 'kubectl get pods'
-                sh 'kubectl get svc'
+                sh '/usr/local/bin/kubectl get pods'
+                sh '/usr/local/bin/kubectl get svc'
             }
         }
     }
