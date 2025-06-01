@@ -9,13 +9,12 @@ pipeline {
         stage('Build & Load Docker Image inside Minikube') {
             steps {
                 sh '''
+                    export PATH=$PATH:/usr/local/bin
                     echo "Setting up Minikube Docker environment..."
-                    eval $(/usr/local/bin/minikube docker-env)
+                    eval $(minikube docker-env)
 
                     echo "Building Docker image inside Minikube..."
                     docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
-
-                    echo "Docker image built: ${IMAGE_NAME}:${IMAGE_TAG}"
                 '''
             }
         }
